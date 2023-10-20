@@ -1,0 +1,74 @@
+<script>
+	import { goto } from '$app/navigation';
+	import { createEventDispatcher, getContext } from 'svelte';
+
+	function getSearch() {
+		const valueSearch = document.getElementById('search').value;
+		console.log(valueSearch);
+	}
+
+	export let items = [];
+
+	const subLayoutCtx = getContext('subLayoutCtx');
+	const { pageIcon, pageNav, pageSelectedAction } = getContext(subLayoutCtx);
+
+	const modalCtx = getContext('modalCtx');
+	const { modalSelectedContext, modalSelectedId } = getContext(modalCtx);
+</script>
+
+<div class="row">
+	<div class="col-md-6">
+		<button
+			type="button"
+			class="btn btn-primary btn-sm"
+			on:click={() => goto('/admin-area/mines/add')}><i class="bi bi-plus-lg" /></button
+		>
+	</div>
+	<div class="col-md-6">
+		<input
+			id="search"
+			on:change={getSearch}
+			type="text"
+			class="form-control"
+			placeholder="Pencarian"
+		/>
+	</div>
+</div>
+<hr />
+
+<div class="table-responsive">
+	<table class="table table-striped table-bordered tb-list">
+		<thead class="table-dark text-center">
+			<tr>
+				<th scope="col">#</th>
+				<th scope="col">Nama</th>
+				<th scope="col">Location</th>
+				<th scope="col">Status</th>
+				<th scope="col">##</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each items as item, i}
+				<tr>
+					<th scope="row" class="text-center">{++i}</th>
+					<td>{item.name}</td>
+					<td>{item.location}</td>
+					<td>{item.status ? (item.status == 'active' ? 'Aktif' : 'Tidak Aktif') : '-'}</td>
+					<td class="text-center">
+						<button on:click={() => goto(`mines/edit?id=${item.id}`)} class="btn btn-primary btn-sm"
+							><i class="bi bi-pencil" /></button
+						>
+						<button
+							on:click={() => {
+								$pageSelectedAction = 'showDelete';
+								$modalSelectedContext = 'mines';
+								$modalSelectedId = item.id;
+							}}
+							class="btn btn-danger btn-sm"><i class="bi bi-trash" /></button
+						>
+					</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+</div>

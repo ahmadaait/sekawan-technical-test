@@ -1,0 +1,52 @@
+<script>
+	import List from '$lib/testpackage/list.svelte';
+	import ContentTop from '$lib/common/contentTop.svelte';
+
+	import { getContext } from 'svelte';
+	import { xfetch } from '$lib/app/request.js';
+
+	const layoutCtx = getContext('layoutCtx');
+	const { pageTitle } = getContext(layoutCtx);
+
+	const subLayoutCtx = getContext('subLayoutCtx');
+	const { pageIcon, pageFrameless, pageSelectedAction } = getContext(subLayoutCtx);
+
+	$pageTitle = 'Test Paket';
+	$pageFrameless = false;
+
+	const contentTop = {
+		title: 'List Paket'
+	};
+
+	let item = xfetch('testpackage');
+
+	// show modal
+	const modalCtx = getContext('modalCtx');
+	const { modalSetting, modalComponent, modalComponentSetting, modalVisibility } =
+		getContext(modalCtx);
+
+	function showDeleteModal() {
+		$modalSetting = {
+			title: 'Hapus Paket'
+		};
+		$modalComponent = import('$lib/testpackage/deleteContent.svelte');
+		$modalComponentSetting = {
+			delBtnShow: true
+		};
+		$modalVisibility = true;
+	}
+
+	function closeModal() {
+		$pageSelectedAction = null;
+	}
+
+	$: if ($pageSelectedAction == 'showDelete') showDeleteModal();
+	$: if (!$modalVisibility) closeModal();
+</script>
+
+<ContentTop item={contentTop} />
+{#await item}
+	<div>Processing</div>
+{:then result}
+	<List items={result.data} />
+{/await}
